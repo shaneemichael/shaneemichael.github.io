@@ -1,0 +1,1270 @@
+---
+import Base from "../layouts/Base.astro";
+import RollButton from "../components/RollButton.astro";
+
+const contacts = [
+  {
+    label: "GitHub",
+    href: "https://github.com/shaneemichael",
+    icon: '<path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/><path d="M9 18c-4.51 2-5-2-7-2"/>',
+  },
+  {
+    label: "LinkedIn",
+    href: "https://www.linkedin.com/in/shane-michael-tanata",
+    icon: '<path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect width="4" height="12" x="2" y="9"/><circle cx="4" cy="4" r="2"/>',
+  },
+  {
+    label: "Email",
+    href: "mailto:shanemichaeltanata@gmail.com",
+    icon: '<rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>',
+  },
+];
+
+const awards = [
+  { rank: "23rd", scope: "Regional", title: "ICPC Asia Jakarta Regional Contest", note: "Finalist", when: "Nov 2025", featured: true },
+  { rank: "25th", scope: "Regional", title: "ICPC Asia Jakarta Regional Contest", note: "Finalist", when: "Dec 2024", featured: true },
+  { rank: "34th", scope: "Regional", title: "ICPC Asia Jakarta Regional Contest", note: "Finalist", when: "Dec 2023", featured: true },
+  {
+    rank: "Gold",
+    scope: "National",
+    title: "Indonesia National Olympiad in Informatics (NOI)",
+    note: "Second stage of the IOI National Training Camp (top 20+) · APIO 2023 participant",
+    when: "Nov 2021",
+    featured: true,
+  },
+  { rank: "19th", scope: "National", title: "ICPC Asia Jakarta – Indonesia National Contest", note: "Finalist", when: "Oct 2025" },
+  { rank: "3rd", scope: "National", title: "Codefest 001", note: "Competitive programming · Universitas Sumatera Utara", when: "May 2025" },
+  { rank: "5th", scope: "National", title: "Hology 7.0", note: "Competitive programming · Universitas Brawijaya", when: "Nov 2024" },
+  { rank: "15th", scope: "National", title: "ICPC Asia Jakarta – Indonesia National Contest", note: "Finalist", when: "Oct 2024" },
+  { rank: "HM", scope: "National", title: "GEMASTIK 2024", note: "Honorable Mention", when: "Sep 2024" },
+  { rank: "13th", scope: "National", title: "ICPC Asia Jakarta – Indonesia National Contest", note: "Finalist", when: "Nov 2023" },
+  { rank: "5th", scope: "National", title: "Olimpiade Matematika ITS (OMITS)", note: "Mathematics · Institut Teknologi Sepuluh Nopember", when: "Aug 2019" },
+  { rank: "4th", scope: "National", title: "Math and Logic Competition (MLC)", note: "Mathematics · Universitas Airlangga", when: "Nov 2018" },
+  { rank: "1st", scope: "National", title: "Olimpiade Matematika Vektor 2018", note: "Mathematics, team category · Universitas Negeri Malang", when: "Nov 2018" },
+];
+const featuredAwards = awards.filter((a) => a.featured);
+const otherAwards = awards.filter((a) => !a.featured);
+
+const projects = [
+  {
+    name: "Scalpel",
+    blurb:
+      "An information-retrieval engine from scratch: BSBI and SPIMI indexing, Variable-Byte and Elias-Gamma compressed postings, TF-IDF and BM25 ranking, and WAND pruning for fast top-k queries. No NLP libraries.",
+    stack: ["Python", "BM25", "WAND", "Index compression"],
+    code: "https://github.com/shaneemichael/TBI_search_engine",
+    live: "https://search-engine-nine-sepia.vercel.app",
+    demo: { src: "/projects/scalpel.mp4", width: 1920, height: 1080, rate: 2 },
+  },
+  {
+    name: "Stockbit Scraper",
+    blurb:
+      "A Next.js dashboard for Indonesian stock data from Stockbit's API: watchlists, broker activity, insider trading, financial statements and key ratios.",
+    stack: ["Next.js", "TypeScript", "Tailwind CSS"],
+    code: "https://github.com/shaneemichael/stockbit_scraper",
+    stars: { repo: "shaneemichael/stockbit_scraper", fallback: 6 },
+    live: "https://stockbit-scraper.vercel.app",
+    demo: { src: "/projects/stockbit-scraper.webm", width: 1280, height: 800, rate: 2 },
+  },
+];
+
+// Star counts are fetched when the site is built; the fallback keeps the badge if GitHub is unreachable.
+async function githubStars(repo: string, fallback: number) {
+  try {
+    const res = await fetch(`https://api.github.com/repos/${repo}`, {
+      headers: { Accept: "application/vnd.github+json" },
+      signal: AbortSignal.timeout(5000),
+    });
+    if (!res.ok) return fallback;
+    const data = await res.json();
+    return typeof data.stargazers_count === "number" ? data.stargazers_count : fallback;
+  } catch {
+    return fallback;
+  }
+}
+const projectStars = new Map(
+  await Promise.all(
+    projects
+      .filter((p) => p.stars)
+      .map(async (p) => [p.name, await githubStars(p.stars!.repo, p.stars!.fallback)] as const),
+  ),
+);
+
+const roles = [
+  {
+    org: "Huawei Hong Kong Research Center",
+    title: "Research Intern",
+    when: "Jul 2026 – Present",
+    current: true,
+    logo: { src: "/logos/huawei.svg", tile: "#ffffff" },
+    tags: ["C++", "C", "LLVM / Clang", "AST", "Python", "AI agents", "HTML", "CSS"],
+    points: [
+      "Contributed performance and correctness improvements to an internal engineering software toolchain.",
+      "Optimized processing efficiency and memory use to better support large workloads.",
+      "Expanded automated regression coverage and added performance diagnostics to evaluate changes.",
+      "Investigated complex correctness issues and integrated fixes across a collaboratively developed codebase.",
+    ],
+  },
+  {
+    org: "Datacakra",
+    title: "Associate Backend Engineer",
+    when: "Jun – Aug 2025",
+    logo: { src: "/logos/datacakra.png", tile: "#ffffff" },
+    tags: ["NestJS", "React", "Redux Toolkit", "IndexedDB", "MQTT", "WebSockets", "PostgreSQL", "Docker"],
+    points: [
+      "Designed and launched a full-featured Inventory Management System; utilized ReactJS and Redux Toolkit for complex state management and implemented IndexedDB to enable complete offline operations, guaranteeing uninterrupted use in low-connectivity environments.",
+      "Developed a NestJS microservice to process real-time IoT data from an MQTT broker, implementing a stabilization algorithm to ensure only accurate weight measurements were captured.",
+      "Engineered the real-time data layer for an Asset Tracking System, implementing a WebSocket API to push live GPS coordinate streams from the server to a dynamic front-end dashboard.",
+      "Initiated the development of a Quality Management System, building the core API with NestJS and designing the schema in PostgreSQL. Fully containerized the application with Docker to create a reproducible environment and streamline deployment.",
+      "Diagnosed, troubleshot, and resolved complex bugs in a production React and NestJS environment, conducting root cause analysis to prevent recurrence.",
+    ],
+  },
+  {
+    org: "Kokocoder",
+    title: "Full Stack Developer Intern",
+    when: "Jan – May 2025",
+    logo: { src: "/logos/kokocoder.png", tile: "#1c1917" },
+    tags: ["OAuth", "Python", "Vue", "Nuxt"],
+    points: [
+      "Actively fixed bugs that occur in both frontend and backend, improving system stability and user experience.",
+      "Integrated OAuth2 features, enhancing user authentication security and streamlining login processes.",
+      "Designed a maintainable and expandable code architecture, improving system scalability and reducing future development time.",
+      "Refactored codebase and minimized code smells, leading to improved code readability and maintainability.",
+    ],
+  },
+  {
+    org: "Universitas Indonesia",
+    title: "Teaching Assistant",
+    when: "Jul – Dec 2024",
+    logo: { src: "/logos/ui.svg", tile: "#1c1917" },
+    tags: ["Python", "Foundations of Programming"],
+    points: [
+      "Teaching Assistant for Foundation of Programming (60+ students) in the Faculty of Computer Science.",
+      "Collaborated with lecturers to support assessments and student learning.",
+      "Created assignments and solutions to reinforce core theoretical concepts.",
+    ],
+  },
+  {
+    org: "Kokocoder",
+    title: "Competitive Programming Coach",
+    when: "Jan 2024 – Present",
+    current: true,
+    logo: { src: "/logos/kokocoder.png", tile: "#1c1917" },
+    tags: ["C++", "Data Structures & Algorithms"],
+    points: [
+      "Teaching Foundation of Programming, Data Structure and Algorithm, and Competitive Programming for middle school to college students.",
+      "Preparing middle and high school students for Indonesia National Olympiad in Informatics.",
+    ],
+  },
+];
+
+const VISIBLE_POINTS = 2;
+
+// Tags with a logo in /public/icons; anything not listed renders as a plain chip.
+const TECH_ICONS: Record<string, string> = {
+  "C++": "cplusplus",
+  C: "c",
+  "LLVM / Clang": "llvm",
+  AST: "ast",
+  Python: "python",
+  HTML: "html5",
+  CSS: "css3",
+  NestJS: "nestjs",
+  React: "react",
+  "Redux Toolkit": "redux",
+  MQTT: "mqtt",
+  PostgreSQL: "postgresql",
+  Docker: "docker",
+  Vue: "vuedotjs",
+  Nuxt: "nuxtdotjs",
+  "Next.js": "nextdotjs",
+  "Tailwind CSS": "tailwindcss",
+  TypeScript: "typescript",
+};
+---
+
+<Base
+  title="Shane Michael Tanata Tendy — Software Engineer"
+  description="Software engineer and competitive programmer. Backend, real-time systems and full-stack web."
+>
+  <div class="progress" data-progress aria-hidden="true"></div>
+  <div class="progress-brush" data-progress-brush aria-hidden="true">
+    <svg viewBox="0 0 40 180">
+      <g transform="translate(0 180) scale(1 -1)">
+        <path d="M17 3.5c0-2.5 6-2.5 6 0l3.2 99.5H13.8z" fill="#65463e" />
+        <rect x="12.5" y="101" width="15" height="24" rx="2.5" fill="#c9beb1" />
+        <path d="M12.5 125h15c1.4 17-1.6 35-7.5 52-5.9-17-8.9-35-7.5-52z" fill="#3b2923" />
+        <path d="M14.4 146c1.3 11 3.3 21 5.6 31 2.3-10 4.3-20 5.6-31-3.7 2.2-7.5 2.2-11.2 0z" fill="#b99a87" />
+      </g>
+    </svg>
+  </div>
+  <canvas class="filings" data-filings aria-hidden="true"></canvas>
+
+  <header class="nav" data-nav>
+    <div class="nav-inner">
+      <a class="nav-mark" href="#top" aria-label="Shane Michael, back to top"><span class="signature" aria-hidden="true">Shane Michael</span></a>
+      <div class="nav-right">
+        <nav class="nav-links" aria-label="Primary">
+          <a href="#experience">Experience</a>
+          <a href="#competitions">Competitions</a>
+          <a href="#projects">Projects</a>
+        </nav>
+        <span class="nav-divider" aria-hidden="true"></span>
+        <ul class="nav-contacts" aria-label="Contact">
+          {
+            contacts.map((c) => (
+              <li>
+                <a
+                  class="icon-link"
+                  href={c.href}
+                  aria-label={c.label}
+                  title={c.label}
+                  {...(c.href.startsWith("http") ? { target: "_blank", rel: "noopener" } : {})}
+                >
+                  <svg
+                    viewBox="0 0 24 24"
+                    width="18"
+                    height="18"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.75"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    aria-hidden="true"
+                    set:html={c.icon}
+                  />
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+    </div>
+  </header>
+
+  <main id="main">
+    <section class="hero" id="top" data-hero>
+      <div class="hero-stage" data-hero-stage>
+        <canvas data-hero-canvas aria-hidden="true"></canvas>
+      </div>
+
+      <div class="hero-grid wrap">
+        <div class="hero-name-slot" data-hero-slot>
+          <h1 class="hero-name">Shane Michael<br />Tanata Tendy</h1>
+        </div>
+
+        <div class="hero-bio">
+          <p class="eyebrow">Software Engineer</p>
+          <p class="hero-headline">Fast on the scoreboard.<br />Careful in production.</p>
+          <p class="hero-lede">
+            Competitive programmer turned software engineer. Now a research intern at Huawei's Hong
+            Kong Research Center, building agent-driven tooling that traces C/C++ programs at runtime
+            and maps their data dependencies with LLVM. Before that: real-time IoT backends and
+            offline-first apps.
+          </p>
+          <div class="hero-actions">
+            <RollButton href="#experience" label="See the work" />
+            <button class="hold" type="button" data-hero-hold hidden aria-pressed="false">
+              Toggle globe
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="chapter wrap exp" id="experience" aria-labelledby="exp-title">
+      <div class="exp-intro">
+        <p class="eyebrow" data-reveal>01 — Experience</p>
+        <h2 id="exp-title" data-reveal>Shipped, not just solved.</h2>
+      </div>
+
+      <div class="role-col">
+        <span class="edge-fade edge-fade-top" aria-hidden="true"></span>
+        <ol class="role-list">
+        {
+          roles.map((r, i) => {
+            const shown = r.points.slice(0, VISIBLE_POINTS);
+            const more = r.points.slice(VISIBLE_POINTS);
+            const panelId = `role-more-${i}`;
+            return (
+              <li>
+                <article class="role-card" data-reveal>
+                  <header class="role-card-head">
+                    <span class="role-logo" style={`background:${r.logo.tile}`}>
+                      <img src={r.logo.src} alt="" width="28" height="28" loading="lazy" decoding="async" />
+                    </span>
+                    <div class="role-titles">
+                      <h3>{r.title}</h3>
+                      <p class="role-org">{r.org}</p>
+                    </div>
+                    <div class="role-when">
+                      {r.current && (
+                        <span class="role-current">
+                          <span class="pulse" aria-hidden="true" />
+                          Current
+                        </span>
+                      )}
+                      <span class="role-date">{r.when}</span>
+                    </div>
+                  </header>
+
+                  <ul class="role-points">
+                    {shown.map((p) => (
+                      <li>{p}</li>
+                    ))}
+                  </ul>
+                  {more.length > 0 && (
+                    <div class="role-more" id={panelId} data-more-panel>
+                      <ul class="role-points">
+                        {more.map((p) => (
+                          <li>{p}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+
+                  <footer class="role-card-foot">
+                    <ul class="role-tags" aria-label="Skills">
+                      {r.tags.map((t) => (
+                        <li>
+                          {TECH_ICONS[t] && (
+                            <img src={`/icons/${TECH_ICONS[t]}.svg`} alt="" width="14" height="14" loading="lazy" decoding="async" />
+                          )}
+                          {t}
+                        </li>
+                      ))}
+                    </ul>
+                    {more.length > 0 && (
+                      <button
+                        class="more-toggle"
+                        type="button"
+                        aria-expanded="false"
+                        aria-controls={panelId}
+                        data-more-toggle
+                        data-more-count={more.length}
+                        hidden
+                      >
+                        <span data-more-label>Read more ({more.length})</span>
+                        <svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                          <path d="m4 6 4 4 4-4" />
+                        </svg>
+                      </button>
+                    )}
+                  </footer>
+                </article>
+              </li>
+            );
+          })
+        }
+        </ol>
+        <span class="edge-fade edge-fade-bottom" aria-hidden="true"></span>
+      </div>
+    </section>
+
+    <section class="chapter wrap" id="competitions" aria-labelledby="comp-title">
+      <p class="eyebrow" data-reveal>02 — Competitions</p>
+      <h2 id="comp-title" data-reveal>Trained against the clock.</h2>
+      <ul class="awards">
+        {
+          featuredAwards.map((a) => (
+            <li class="award" data-reveal>
+              <span class="award-rank">{a.rank}</span>
+              <span class="award-where">{a.scope}</span>
+              <span class="award-what">
+                <span class="award-title">{a.title}</span>
+                {a.note && <span class="award-note">{a.note}</span>}
+              </span>
+              <span class="award-when">{a.when}</span>
+            </li>
+          ))
+        }
+      </ul>
+      {otherAwards.length > 0 && (
+        <>
+          <div class="role-more" id="awards-more" data-more-panel>
+            <ul class="awards awards-rest">
+              {otherAwards.map((a) => (
+                <li class="award" data-reveal>
+                  <span class="award-rank">{a.rank}</span>
+                  <span class="award-where">{a.scope}</span>
+                  <span class="award-what">
+                    <span class="award-title">{a.title}</span>
+                    {a.note && <span class="award-note">{a.note}</span>}
+                  </span>
+                  <span class="award-when">{a.when}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+          <button
+            class="more-toggle awards-toggle"
+            type="button"
+            aria-expanded="false"
+            aria-controls="awards-more"
+            data-more-toggle
+            data-more-text="See more"
+            data-more-count={otherAwards.length}
+            hidden
+          >
+            <span data-more-label>See more ({otherAwards.length})</span>
+            <svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="m4 6 4 4 4-4" />
+            </svg>
+          </button>
+        </>
+      )}
+    </section>
+
+    <section class="chapter wrap" id="projects" aria-labelledby="proj-title">
+      <p class="eyebrow" data-reveal>03 — Projects</p>
+      <h2 id="proj-title" data-reveal>Side quests, shipped.</h2>
+      <ul class="projects">
+        {
+          projects.map((p) => (
+            <li class:list={["project", { "has-demo": p.demo }]} data-reveal>
+              {p.demo && (
+                <div class="demo" data-demo data-playing="false">
+                  <div class="demo-window">
+                    <video
+                      data-src={p.demo.src}
+                      data-rate={p.demo.rate}
+                      width={p.demo.width}
+                      height={p.demo.height}
+                      muted
+                      loop
+                      playsinline
+                      preload="none"
+                      aria-label={`Demo of ${p.name}`}
+                    />
+                    <button class="demo-toggle" type="button" data-demo-toggle aria-label="Play demo video">
+                      <svg class="icon-pause" viewBox="0 0 16 16" width="14" height="14" aria-hidden="true">
+                        <rect x="3.5" y="2.5" width="3" height="11" rx="1" fill="currentColor" />
+                        <rect x="9.5" y="2.5" width="3" height="11" rx="1" fill="currentColor" />
+                      </svg>
+                      <svg class="icon-play" viewBox="0 0 16 16" width="14" height="14" aria-hidden="true">
+                        <path d="M4.5 2.8v10.4a.8.8 0 0 0 1.2.7l8.3-5.2a.8.8 0 0 0 0-1.4L5.7 2.1a.8.8 0 0 0-1.2.7z" fill="currentColor" />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              )}
+              <div class="project-body">
+              <div class="project-head">
+                <h3>{p.name}</h3>
+                {p.stars && (
+                  <a
+                    class="project-stars"
+                    href={`https://github.com/${p.stars.repo}/stargazers`}
+                    target="_blank"
+                    rel="noopener"
+                    aria-label={`${projectStars.get(p.name)} stars on GitHub`}
+                  >
+                    <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true">
+                      <path
+                        fill="currentColor"
+                        d="M8 .25a.75.75 0 0 1 .673.418l1.882 3.815 4.21.612a.75.75 0 0 1 .416 1.279l-3.046 2.97.719 4.192a.75.75 0 0 1-1.088.791L8 12.347l-3.766 1.98a.75.75 0 0 1-1.088-.79l.72-4.194L.818 6.374a.75.75 0 0 1 .416-1.28l4.21-.611L7.327.668A.75.75 0 0 1 8 .25Z"
+                      />
+                    </svg>
+                    {projectStars.get(p.name)}
+                  </a>
+                )}
+              </div>
+              <p class="project-blurb">{p.blurb}</p>
+              <ul class="project-stack" aria-label="Built with">
+                {p.stack.map((t) => (
+                  <li>
+                    {TECH_ICONS[t] && (
+                      <img src={`/icons/${TECH_ICONS[t]}.svg`} alt="" width="14" height="14" loading="lazy" decoding="async" />
+                    )}
+                    {t}
+                  </li>
+                ))}
+              </ul>
+              <div class="project-links">
+                <RollButton href={p.code} label="Code" variant="outline" external srLabel={`Code for ${p.name}`} />
+                {p.live && (
+                  <RollButton href={p.live} label="Live" variant="outline" external srLabel={`Live demo of ${p.name}`} />
+                )}
+              </div>
+              </div>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+
+  </main>
+
+  <footer class="foot wrap">
+    <p>© 2026 Shane Michael Tanata Tendy</p>
+  </footer>
+</Base>
+
+<style>
+  .nav {
+    position: fixed;
+    inset: 0 0 auto 0;
+    z-index: var(--z-nav);
+    display: flex;
+    justify-content: center;
+    padding-top: 0.75rem;
+    pointer-events: none;
+  }
+  .nav-inner {
+    pointer-events: auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: min(720px, 100% - 1.5rem);
+    padding: 0.25rem 0.5rem 0.25rem 0.75rem;
+    border: 1px solid transparent;
+    border-radius: 999px;
+    background: transparent;
+    transition: background-color 300ms var(--ease-out), border-color 300ms var(--ease-out),
+      box-shadow 300ms var(--ease-out), backdrop-filter 300ms var(--ease-out);
+  }
+  .nav[data-floating="true"] .nav-inner {
+    border-color: var(--border);
+    background: color-mix(in srgb, var(--bg) 78%, transparent);
+    box-shadow: 0 8px 28px rgb(59 41 35 / 0.12);
+    -webkit-backdrop-filter: blur(14px) saturate(1.2);
+    backdrop-filter: blur(14px) saturate(1.2);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .nav-inner {
+      transition: none;
+    }
+  }
+  .nav-right {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+  }
+  .nav-links {
+    display: flex;
+    gap: 0.1rem;
+  }
+  .nav-divider {
+    width: 1px;
+    height: 20px;
+    margin-inline: 0.35rem;
+    background: var(--border);
+  }
+  .nav-contacts {
+    display: flex;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .nav .icon-link {
+    justify-content: center;
+    width: 44px;
+    padding: 0;
+  }
+  .nav .icon-link:hover {
+    color: var(--accent-text);
+  }
+  @media (max-width: 760px) {
+    .nav-links,
+    .nav-divider {
+      display: none;
+    }
+  }
+  .nav a {
+    text-decoration: none;
+    color: var(--muted);
+    padding: 0.65rem 0.9rem;
+    font-size: 0.9rem;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    border-radius: 999px;
+    transition: color 200ms var(--ease-out), background-color 200ms var(--ease-out);
+  }
+  .nav a:hover {
+    color: var(--fg);
+    background: rgb(59 41 35 / 0.07);
+  }
+  .nav .nav-mark {
+    color: var(--fg);
+    padding-inline: 0.5rem 0.75rem;
+    border-radius: 12px;
+  }
+  .nav .nav-mark:hover {
+    background: none;
+    color: var(--accent-text);
+  }
+  .signature {
+    display: inline-block;
+    font-family: var(--font-signature);
+    font-size: 1.6rem;
+    line-height: 1;
+    padding: 0.2rem 0.4rem 0.2rem 0.1rem;
+    animation: sign 1.4s cubic-bezier(0.65, 0, 0.35, 1) 0.2s both;
+  }
+  @keyframes sign {
+    from {
+      clip-path: inset(-20% 100% -20% 0);
+    }
+    to {
+      clip-path: inset(-20% 0 -20% 0);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .signature {
+      animation: none;
+    }
+  }
+  @media (max-width: 480px) {
+    .nav a {
+      padding-inline: 0.65rem;
+    }
+  }
+
+  .hero {
+    position: relative;
+    min-height: 100svh;
+    display: grid;
+    align-items: center;
+    overflow: hidden;
+  }
+  .hero-stage {
+    position: absolute;
+    inset: 0;
+    touch-action: pan-y;
+  }
+  .hero-stage canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+  .hero-grid {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: clamp(2rem, 6vw, 6rem);
+    align-items: center;
+    padding-block: 6rem 3rem;
+    pointer-events: none;
+  }
+  .hero-name-slot {
+    height: clamp(240px, 48svh, 460px);
+    display: flex;
+    align-items: center;
+  }
+  .hero-name {
+    font-size: clamp(2.4rem, 5.2vw, 5rem);
+    font-weight: 700;
+  }
+  .hero[data-canvas="on"] .hero-name {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+  }
+  .hero-bio {
+    max-width: 34rem;
+  }
+  .hero-headline {
+    margin: 0.75rem 0 0;
+    font-family: var(--font-serif);
+    font-size: clamp(2.4rem, 4.4vw, 4rem);
+    line-height: 1.05;
+    letter-spacing: -0.01em;
+    color: var(--fg);
+  }
+  .hero-lede {
+    margin: 1.25rem 0 0;
+    color: var(--muted);
+    font-size: clamp(1rem, 1.3vw, 1.125rem);
+    max-width: 46ch;
+  }
+  .hero-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem 1.25rem;
+    align-items: center;
+    margin-top: 2rem;
+    pointer-events: auto;
+  }
+  @media (max-width: 900px) {
+    .hero-grid {
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+      padding-block: 5.5rem 2.5rem;
+    }
+    .hero-name-slot {
+      height: clamp(150px, 22svh, 240px);
+      justify-content: center;
+      text-align: center;
+    }
+    .hero-bio {
+      margin-inline: auto;
+      text-align: center;
+    }
+    .hero-lede {
+      margin-inline: auto;
+    }
+    .hero-actions {
+      justify-content: center;
+    }
+  }
+
+  .hold {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+  }
+  .hold:focus-visible {
+    position: static;
+    width: auto;
+    height: auto;
+    clip: auto;
+    min-height: 44px;
+    padding: 0 1rem;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background: var(--bg);
+    color: var(--fg);
+    font: 500 0.85rem var(--font-mono);
+  }
+
+
+  .chapter {
+    padding-block: clamp(5rem, 14vh, 9rem);
+    border-top: 1px solid var(--border);
+  }
+  .chapter h2 {
+    font-size: clamp(2rem, 5vw, 3.75rem);
+    max-width: 18ch;
+    margin-top: 0.75rem;
+  }
+
+  .awards {
+    list-style: none;
+    padding: 0;
+    margin: 3rem 0 0;
+    display: grid;
+    border-top: 1px solid var(--border);
+  }
+  .award {
+    display: grid;
+    grid-template-columns: 5rem 9rem 1fr auto;
+    gap: 1rem;
+    align-items: baseline;
+    padding: 1.1rem 0.25rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .award-rank {
+    font: 700 1.75rem var(--font-display);
+    color: var(--accent-text);
+  }
+  .award-where,
+  .award-when {
+    font: 400 0.85rem var(--font-mono);
+    color: var(--muted);
+  }
+  .award-what {
+    display: grid;
+    gap: 0.2rem;
+  }
+  .award-title {
+    font-weight: 500;
+  }
+  .award-note {
+    color: var(--muted);
+    font-size: 0.875rem;
+  }
+  .awards-rest {
+    margin: 0;
+    border-top: 0;
+  }
+  .awards-toggle {
+    margin-top: 0.75rem;
+  }
+  @media (max-width: 640px) {
+    .award {
+      grid-template-columns: 4rem 1fr;
+    }
+    .award-what {
+      grid-column: 2;
+    }
+    .award-when {
+      grid-column: 2;
+    }
+  }
+
+  .exp {
+    display: grid;
+    grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.5fr);
+    gap: 2rem clamp(2rem, 5vw, 5rem);
+    align-items: start;
+  }
+  .exp-intro {
+    position: sticky;
+    top: 7rem;
+    /* Above the cards' edge-fade bands, which park just over the list (and over the intro when stacked). */
+    z-index: 3;
+  }
+  @media (max-width: 960px) {
+    .exp {
+      grid-template-columns: 1fr;
+    }
+    .exp-intro {
+      position: relative;
+      top: 0;
+    }
+  }
+
+  .role-col {
+    --fade-t: clamp(110px, 22dvh, 190px);
+    --fade-b: clamp(56px, 16dvh, 160px);
+    position: relative;
+    /* Room for the bands to park outside the cards (sticky can't leave its parent); margins cancel it out. */
+    padding-block: var(--fade-t) var(--fade-b);
+    margin-block: calc(var(--fade-t) * -1) calc(var(--fade-b) * -1);
+  }
+  /* Stacked: the intro sits directly above the list, so don't pull the column up into it. */
+  @media (max-width: 960px) {
+    .role-col {
+      padding-top: 0;
+      margin-top: 0;
+    }
+  }
+  .role-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 1.25rem;
+  }
+  /* Bands sit just outside the column, then pin to the viewport edges while it scrolls past,
+     so cards dissolve under the nav and materialise at the bottom without clipping the first/last card. */
+  .edge-fade {
+    position: sticky;
+    z-index: 2;
+    display: block;
+    pointer-events: none;
+  }
+  .edge-fade-top {
+    top: 0;
+    height: var(--fade-t);
+    margin-top: calc(var(--fade-t) * -1);
+    background: linear-gradient(to bottom, var(--bg) 0, var(--bg) 46%, transparent);
+  }
+  .edge-fade-bottom {
+    bottom: 0;
+    height: var(--fade-b);
+    margin-bottom: calc(var(--fade-b) * -1);
+    background: linear-gradient(to top, var(--bg) 0, var(--bg) 12%, transparent);
+  }
+
+  .role-card {
+    padding: 1.5rem;
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    background: color-mix(in srgb, var(--surface) 55%, var(--bg));
+    transition: border-color 250ms ease, box-shadow 250ms ease;
+  }
+  .role-card:hover {
+    border-color: var(--accent);
+    box-shadow: 0 10px 30px rgb(59 41 35 / 0.08);
+  }
+  .role-card-head {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    gap: 1rem;
+    align-items: start;
+  }
+  .role-logo {
+    display: grid;
+    place-items: center;
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    overflow: hidden;
+  }
+  .role-logo img {
+    width: 28px;
+    height: 28px;
+    object-fit: contain;
+  }
+  .role-titles h3 {
+    font-size: 1.3rem;
+  }
+  .role-org {
+    margin: 0.3rem 0 0;
+    color: var(--muted);
+    font-weight: 500;
+  }
+  .role-when {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.4rem;
+  }
+  .role-date {
+    font: 400 0.8rem var(--font-mono);
+    color: var(--muted);
+    white-space: nowrap;
+  }
+  .role-current {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.2rem 0.6rem;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--accent) 22%, transparent);
+    color: var(--accent-text);
+    font: 600 0.72rem var(--font-mono);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  .pulse {
+    position: relative;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--accent-text);
+  }
+  .pulse::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: var(--accent-text);
+    animation: pulse 1.8s ease-out infinite;
+  }
+  @keyframes pulse {
+    to {
+      transform: scale(2.6);
+      opacity: 0;
+    }
+  }
+  @media (max-width: 560px) {
+    .role-card-head {
+      grid-template-columns: auto minmax(0, 1fr);
+    }
+    .role-when {
+      grid-column: 1 / -1;
+      flex-direction: row;
+      align-items: center;
+    }
+  }
+
+  .role-points {
+    list-style: none;
+    margin: 1.25rem 0 0;
+    padding: 0;
+    display: grid;
+    gap: 0.65rem;
+  }
+  .role-more .role-points {
+    margin-top: 0;
+  }
+  .role-points li {
+    position: relative;
+    padding-left: 1.25rem;
+    color: var(--fg);
+  }
+  .role-points li::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0.72em;
+    width: 0.6rem;
+    height: 1.5px;
+    background: var(--accent-text);
+  }
+  .role-more {
+    display: grid;
+    grid-template-rows: 1fr;
+    margin-top: 0.65rem;
+    transition: grid-template-rows 450ms cubic-bezier(0.19, 1, 0.22, 1), margin-top 450ms cubic-bezier(0.19, 1, 0.22, 1);
+  }
+  .role-more > * {
+    min-height: 0;
+    overflow: hidden;
+  }
+  .role-more[data-open="false"] {
+    grid-template-rows: 0fr;
+    margin-top: 0;
+  }
+
+  .role-card-foot {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.75rem 1rem;
+    margin-top: 1.25rem;
+  }
+  .role-tags {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+  }
+  .role-tags li {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font: 400 0.75rem var(--font-mono);
+    padding: 0.25rem 0.6rem;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    color: var(--muted);
+  }
+  .role-tags img {
+    width: 14px;
+    height: 14px;
+    flex: none;
+  }
+  .more-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    min-height: 44px;
+    padding: 0 0.25rem;
+    border: 0;
+    background: none;
+    color: var(--accent-text);
+    font: 600 0.875rem var(--font-body);
+    cursor: pointer;
+  }
+  .more-toggle:hover {
+    color: var(--fg);
+  }
+  .more-toggle svg {
+    transition: transform 300ms ease;
+  }
+  .more-toggle[aria-expanded="true"] svg {
+    transform: rotate(180deg);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .role-more,
+    .more-toggle svg {
+      transition: none;
+    }
+    .pulse::after {
+      animation: none;
+    }
+  }
+
+  .projects {
+    list-style: none;
+    padding: 0;
+    margin: 3rem 0 0;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+  }
+  @media (max-width: 720px) {
+    .projects {
+      grid-template-columns: 1fr;
+    }
+  }
+  .project {
+    display: flex;
+    flex-direction: column;
+    padding: 1.5rem;
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    background: color-mix(in srgb, var(--surface) 55%, var(--bg));
+    transition: border-color 200ms var(--ease-out), transform 200ms var(--ease-out);
+  }
+  .project:hover {
+    border-color: var(--accent);
+    transform: translateY(-2px);
+  }
+  .project h3 {
+    font-family: var(--font-serif);
+    font-weight: 400;
+    font-size: 1.85rem;
+    letter-spacing: -0.01em;
+  }
+  .project-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.75rem;
+  }
+  .project-stars {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    min-height: 32px;
+    padding: 0.2rem 0.65rem;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    color: var(--accent-text);
+    font: 600 0.8rem var(--font-mono);
+    text-decoration: none;
+    white-space: nowrap;
+    transition: border-color 200ms ease, background-color 200ms ease;
+  }
+  .project-stars:hover {
+    border-color: var(--accent);
+    background: color-mix(in srgb, var(--accent) 14%, transparent);
+  }
+  .project-body {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+  }
+
+  /* Demo card: video in a window frame on a watercolour wash, stacked above the text. */
+  .project.has-demo {
+    padding: 0;
+    overflow: hidden;
+  }
+  .project.has-demo .project-body {
+    padding: 1.25rem 1.5rem 1.5rem;
+  }
+  .demo {
+    position: relative;
+    padding: 1.25rem;
+    overflow: hidden;
+    background:
+      radial-gradient(120% 90% at 10% 10%, color-mix(in srgb, var(--accent) 85%, transparent), transparent 60%),
+      radial-gradient(90% 80% at 90% 20%, color-mix(in srgb, var(--ink) 70%, transparent), transparent 65%),
+      radial-gradient(110% 90% at 60% 100%, color-mix(in srgb, var(--border) 95%, transparent), transparent 70%),
+      var(--surface);
+  }
+  .demo-window {
+    position: relative;
+    border-radius: 8px;
+    overflow: hidden;
+    background: #1c1917;
+    box-shadow: 0 12px 28px rgb(28 20 16 / 0.32), 0 2px 6px rgb(28 20 16 / 0.18);
+    aspect-ratio: 1280 / 800;
+  }
+  .demo video {
+    display: block;
+    width: 100%;
+    height: 100%;
+    /* Every demo shares one window shape; fit (not crop) so differently sized recordings stay whole. */
+    object-fit: contain;
+  }
+  .demo-toggle {
+    position: absolute;
+    right: 0.4rem;
+    bottom: 0.4rem;
+    display: grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    border: 0;
+    border-radius: 50%;
+    background: rgb(28 25 23 / 0.6);
+    color: #fff;
+    cursor: pointer;
+    opacity: 0.85;
+    transition: opacity 200ms ease, background-color 200ms ease;
+    -webkit-backdrop-filter: blur(6px);
+    backdrop-filter: blur(6px);
+  }
+  .demo-toggle:hover,
+  .demo-toggle:focus-visible {
+    opacity: 1;
+    background: rgb(28 25 23 / 0.8);
+  }
+  .demo[data-playing="true"] .icon-play,
+  .demo[data-playing="false"] .icon-pause {
+    display: none;
+  }
+  .project-blurb {
+    margin: 0.75rem 0 0;
+    color: var(--muted);
+    flex: 1;
+  }
+  .project-stack {
+    list-style: none;
+    padding: 0;
+    margin: 1.25rem 0 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+  }
+  .project-stack li {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font: 400 0.75rem var(--font-mono);
+    padding: 0.25rem 0.6rem;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    color: var(--muted);
+  }
+  .project-stack img {
+    width: 14px;
+    height: 14px;
+    flex: none;
+  }
+  .project-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 1.25rem;
+  }
+
+  .foot {
+    padding-block: 2rem 3rem;
+    border-top: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 0.85rem;
+  }
+</style>
+
+<script>
+  import "../scripts/scroll";
+  import "../scripts/hover-sound";
+  import { runBrushIntro } from "../scripts/brush-intro";
+  import { initFilings } from "../scripts/filings";
+  import { initDemoVideos } from "../scripts/demo-video";
+
+  initDemoVideos();
+
+  const filings = document.querySelector<HTMLCanvasElement>("[data-filings]");
+  if (filings) initFilings(filings);
+
+
+  document.querySelectorAll<HTMLButtonElement>("[data-more-toggle]").forEach((btn) => {
+    const panel = document.getElementById(btn.getAttribute("aria-controls")!)!;
+    const inner = panel.firstElementChild as HTMLElement;
+    const label = btn.querySelector("[data-more-label]")!;
+    const count = btn.dataset.moreCount;
+    const set = (open: boolean) => {
+      btn.setAttribute("aria-expanded", String(open));
+      panel.dataset.open = String(open);
+      inner.inert = !open;
+      label.textContent = open ? "Show less" : `${btn.dataset.moreText ?? "Read more"} (${count})`;
+    };
+    set(false);
+    btn.hidden = false;
+    btn.addEventListener("click", () => set(btn.getAttribute("aria-expanded") !== "true"));
+  });
+
+  const hero = document.querySelector<HTMLElement>("[data-hero]");
+  const heroReady = hero
+    ? import("../scripts/hero")
+        .then((m) => m.initHero(hero))
+        .then((ok) => {
+          if (!ok) return;
+          hero.dataset.canvas = "on";
+          hero.querySelector<HTMLElement>("[data-hero-hold]")?.removeAttribute("hidden");
+        })
+        .catch(() => {})
+    : Promise.resolve();
+
+  // Brush the page into colour once the hero is actually drawn (capped so a slow load never holds it grey).
+  Promise.race([heroReady, new Promise((r) => setTimeout(r, 2000))]).then(() =>
+    requestAnimationFrame(() => requestAnimationFrame(() => runBrushIntro())),
+  );
+</script>

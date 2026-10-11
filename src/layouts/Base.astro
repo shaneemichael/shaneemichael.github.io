@@ -1,0 +1,61 @@
+---
+import "../styles/global.css";
+
+interface Props {
+  title: string;
+  description: string;
+}
+const { title, description } = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} />
+    <meta name="theme-color" content="#ebebe5" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Instrument+Serif&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@500;700&display=swap"
+    />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Satisfy&text=Shane%20Michael&display=block"
+    />
+    <title>{title}</title>
+    <script is:inline define:vars={{ alwaysPlayIntro: import.meta.env.DEV }}>
+      // Start grey before first paint for the watercolour reveal; a fail-safe restores colour if it never runs.
+      (function () {
+        try {
+          if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+          var replay = alwaysPlayIntro || location.search.indexOf("intro") !== -1;
+          if (!replay && sessionStorage.getItem("brush-intro-seen")) return;
+          var root = document.documentElement;
+          root.classList.add("brush-intro");
+          window.__brushFailsafe = setTimeout(function () {
+            root.classList.remove("brush-intro");
+          }, 8000);
+        } catch (e) {}
+      })();
+    </script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <div class="brush-veil" data-brush-veil aria-hidden="true"></div>
+    <div class="brush-tool" data-brush-tool aria-hidden="true">
+      <svg viewBox="0 0 40 180" width="40" height="180">
+        <path d="M17 3.5c0-2.5 6-2.5 6 0l3.2 99.5H13.8z" fill="#65463e" />
+        <path d="M18.6 8 18 96" stroke="#8a6a5f" stroke-width="1.4" stroke-linecap="round" />
+        <rect x="12.5" y="101" width="15" height="24" rx="2.5" fill="#c9beb1" />
+        <path d="M12.5 108h15M12.5 113h15" stroke="#a8998a" stroke-width="1.2" />
+        <path d="M12.5 125h15c1.4 17-1.6 35-7.5 52-5.9-17-8.9-35-7.5-52z" fill="#3b2923" />
+        <path d="M14.4 146c1.3 11 3.3 21 5.6 31 2.3-10 4.3-20 5.6-31-3.7 2.2-7.5 2.2-11.2 0z" fill="#b99a87" />
+      </svg>
+    </div>
+    <slot />
+  </body>
+</html>

@@ -1,0 +1,130 @@
+---
+interface Props {
+  href: string;
+  label: string;
+  variant?: "solid" | "outline";
+  external?: boolean;
+  srLabel?: string;
+}
+const { href, label, variant = "solid", external = false, srLabel } = Astro.props;
+const linkProps = external ? { target: "_blank", rel: "noopener" } : {};
+---
+
+<a class:list={["roll", variant, { external }]} href={href} {...linkProps}>
+  <span class="roll-mask" aria-hidden="true">
+    <span class="roll-word">{label}</span>
+    <span class="roll-word roll-next">{label}</span>
+  </span>
+  <span class="sr-only">{srLabel ?? label}</span>
+  <span class="roll-dot" aria-hidden="true">
+    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M2 8h11M9 4l4 4-4 4"></path>
+    </svg>
+  </span>
+</a>
+
+<style>
+  .roll {
+    --roll-ease: cubic-bezier(0.19, 1, 0.22, 1);
+    --roll-dur: 800ms;
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.85rem;
+    min-height: 48px;
+    padding: 0 0.45rem 0 1.4rem;
+    border-radius: 999px;
+    overflow: clip;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.95rem;
+    line-height: 1.2;
+    touch-action: manipulation;
+  }
+  .solid {
+    background: var(--ink);
+    color: var(--on-ink);
+  }
+  .outline {
+    min-height: 44px;
+    padding-left: 1.1rem;
+    border: 1px solid var(--border);
+    color: var(--fg);
+    font-size: 0.875rem;
+    transition: border-color 300ms ease;
+  }
+  .outline:hover {
+    border-color: var(--accent);
+  }
+
+  .roll-mask {
+    position: relative;
+    display: block;
+    overflow: hidden;
+  }
+  .roll-word {
+    display: block;
+    transition: transform var(--roll-dur) var(--roll-ease);
+    will-change: transform;
+  }
+  .roll-next {
+    position: absolute;
+    inset: 0;
+    transform: translateY(110%);
+  }
+  .roll:hover .roll-word,
+  .roll:focus-visible .roll-word {
+    transform: translateY(-110%);
+  }
+  .roll:hover .roll-next,
+  .roll:focus-visible .roll-next {
+    transform: translateY(0);
+  }
+
+  .roll-dot {
+    display: grid;
+    place-items: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    overflow: clip;
+    background: var(--accent);
+    color: var(--fg);
+    transform: scale(0.3);
+    transition: transform var(--roll-dur) var(--roll-ease);
+    will-change: transform;
+  }
+  .outline .roll-dot {
+    width: 30px;
+    height: 30px;
+  }
+  .roll-dot svg {
+    width: 15px;
+    height: 15px;
+    transform: translateX(-26px);
+    transition: transform var(--roll-dur) var(--roll-ease);
+  }
+  .external .roll-dot svg {
+    transform: translateX(-26px) rotate(-45deg);
+  }
+  .roll:hover .roll-dot,
+  .roll:focus-visible .roll-dot {
+    transform: scale(1);
+  }
+  .roll:hover .roll-dot svg,
+  .roll:focus-visible .roll-dot svg {
+    transform: translateX(0);
+  }
+  .external:hover .roll-dot svg,
+  .external:focus-visible .roll-dot svg {
+    transform: translateX(0) rotate(-45deg);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .roll-word,
+    .roll-dot,
+    .roll-dot svg {
+      transition: none;
+    }
+  }
+</style>
