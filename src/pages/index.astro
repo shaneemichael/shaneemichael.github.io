@@ -65,6 +65,14 @@ const projects = [
     live: "https://stockbit-scraper.vercel.app",
     demo: { src: "/projects/stockbit-scraper.webm", width: 1280, height: 800, rate: 2 },
   },
+  {
+    name: "Meyline Living",
+    blurb:
+      "Inventory, customer and invoice management for a small home-appliance retailer: barcode stock in/out, promos, invoice issuing with PDF export, owner and staff roles, and an audit log. Runs on Cloudflare Workers with D1 and private R2 storage.",
+    stack: ["Next.js", "TypeScript", "Cloudflare Workers", "D1", "Tailwind CSS"],
+    privateRepo: true,
+    demo: { src: "/projects/meyline-living.webm", width: 1280, height: 800, rate: 2 },
+  },
 ];
 
 // Star counts are fetched when the site is built; the fallback keeps the badge if GitHub is unreachable.
@@ -179,6 +187,7 @@ const TECH_ICONS: Record<string, string> = {
   "Next.js": "nextdotjs",
   "Tailwind CSS": "tailwindcss",
   TypeScript: "typescript",
+  "Cloudflare Workers": "cloudflare",
 };
 ---
 
@@ -480,7 +489,18 @@ const TECH_ICONS: Record<string, string> = {
                 ))}
               </ul>
               <div class="project-links">
-                <RollButton href={p.code} label="Code" variant="outline" external srLabel={`Code for ${p.name}`} />
+                {p.code && (
+                  <RollButton href={p.code} label="Code" variant="outline" external srLabel={`Code for ${p.name}`} />
+                )}
+                {p.privateRepo && (
+                  <span class="project-private">
+                    <svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true">
+                      <rect x="3" y="7" width="10" height="7" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.5" />
+                      <path d="M5.5 7V5a2.5 2.5 0 0 1 5 0v2" fill="none" stroke="currentColor" stroke-width="1.5" />
+                    </svg>
+                    Private repo
+                  </span>
+                )}
                 {p.live && (
                   <RollButton href={p.live} label="Live" variant="outline" external srLabel={`Live demo of ${p.name}`} />
                 )}
@@ -1206,6 +1226,17 @@ const TECH_ICONS: Record<string, string> = {
     width: 14px;
     height: 14px;
     flex: none;
+  }
+  .project-private {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    min-height: 44px;
+    padding: 0 0.9rem;
+    border: 1px dashed var(--border);
+    border-radius: 999px;
+    color: var(--muted);
+    font: 500 0.8rem var(--font-mono);
   }
   .project-links {
     display: flex;
